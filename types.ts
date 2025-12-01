@@ -4,7 +4,8 @@ export enum AppMode {
   STUDENT = 'STUDENT',
   TEACHER = 'TEACHER',
   KAHOOT = 'KAHOOT',
-  SPEAKING = 'SPEAKING'
+  SPEAKING = 'SPEAKING',
+  CAMPAIGN_MENU = 'CAMPAIGN_MENU'
 }
 
 export enum TTTStage {
@@ -84,6 +85,7 @@ export interface AppState {
   tttStage: TTTStage;
   achievements: string[]; // IDs of unlocked achievements
   boss: BossState;
+  campaignProgress: number; // Highest level unlocked (0-20)
 }
 
 export interface DiscoveryPair {
@@ -92,4 +94,10 @@ export interface DiscoveryPair {
   meaning: string;
   meaningRu: string;
   meaningUz: string;
+}
+
+export interface CampaignLevel {
+  id: number;
+  title: string;
+  questions: QuizQuestion[];
 }

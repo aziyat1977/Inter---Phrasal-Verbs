@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppMode, AppState, TTTStage } from './types';
+import { AppMode, AppState, TTTStage, QuizQuestion } from './types';
 import { StudentMode } from './components/StudentMode';
 import { TeacherMode } from './components/TeacherMode';
 import { KahootMode } from './components/KahootMode';
 import { SpeakingMode } from './components/SpeakingMode';
 import { Button, Card, Badge, ProgressBar, playSound, Toast } from './components/UI';
-import { BOSS_CONFIG, UI_TEXT } from './constants';
+import { BOSS_CONFIG, UI_TEXT, CAMPAIGN_LEVELS } from './constants';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
@@ -22,8 +22,11 @@ const App: React.FC = () => {
     currentLessonIndex: 0,
     tttStage: TTTStage.TEST1,
     achievements: [],
-    boss: BOSS_CONFIG
+    boss: BOSS_CONFIG,
+    campaignProgress: 0
   });
+
+  const [currentQuizQuestions, setCurrentQuizQuestions] = useState<QuizQuestion[] | undefined>(undefined);
 
   // Calculate Level based on XP
   useEffect(() => {
@@ -46,13 +49,27 @@ const App: React.FC = () => {
     setState(prev => ({ ...prev, ...partial }));
   };
 
-  const handleKahootExit = (finalScore: number) => {
+  const handleKahootExit = (finalScore: number, passed: boolean) => {
+    // If we were in a campaign, and we passed, unlock next level
+    if (currentQuizQuestions && passed) {
+      // Find which level we just played
+      const levelIndex = CAMPAIGN_LEVELS.findIndex(l => l.questions === currentQuizQuestions);
+      if (levelIndex >= 0 && levelIndex === state.campaignProgress) {
+        updateState({ campaignProgress: state.campaignProgress + 1, achievements: [...state.achievements, 'campaign_hero'] });
+      }
+    }
+
+    // If passed, give rewards
+    const xpGain = passed ? 500 : 50;
+    const gemGain = passed ? 10 : 1;
+
     updateState({ 
       mode: AppMode.HOME, 
       score: state.score + finalScore,
-      xp: state.xp + 500,
-      gems: state.gems + 10
+      xp: state.xp + xpGain,
+      gems: state.gems + gemGain
     });
+    setCurrentQuizQuestions(undefined); // Reset specific quiz
   };
 
   const handleStudentComplete = () => {
@@ -124,152 +141,182 @@ const App: React.FC = () => {
           onExit={handleKahootExit} 
           showRussian={state.showRussian}
           showUzbek={state.showUzbek}
+          customQuestions={currentQuizQuestions}
         />
       </div>
     );
   }
 
+  // Campaign Menu Overlay
+  if (state.mode === AppMode.CAMPAIGN_MENU) {
+    return (
+      <div className={`min-h-screen ${state.isDark ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 flex flex-col`}>
+        <TopBar />
+        <div className="container mx-auto p-4 pt-8">
+           <div className="flex items-center gap-4 mb-8">
+             <Button onClick={() => updateState({ mode: AppMode.HOME })} variant="secondary">⬅️ Back</Button>
+             <h1 className="text-4xl font-black text-slate-800 dark:text-white gamify-font">Campaign Map</h1>
+           </div>
+           
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+             {CAMPAIGN_LEVELS.map((level, idx) => {
+               const isLocked = idx > state.campaignProgress;
+               return (
+                 <div 
+                   key={level.id}
+                   onClick={() => {
+                     if (!isLocked) {
+                       setCurrentQuizQuestions(level.questions);
+                       updateState({ mode: AppMode.KAHOOT });
+                     }
+                   }}
+                   className={`
+                     relative h-40 rounded-3xl border-4 flex flex-col items-center justify-center cursor-pointer transition-all transform hover:scale-105 active:scale-95
+                     ${isLocked 
+                        ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 grayscale opacity-50' 
+                        : 'bg-white dark:bg-slate-800 border-indigo-500 shadow-xl'
+                     }
+                   `}
+                 >
+                   <div className="text-4xl mb-2">{isLocked ? '🔒' : '⚔️'}</div>
+                   <div className="font-bold text-center px-4">
+                     <div className="text-xs uppercase text-slate-400">Level {idx + 1}</div>
+                     <div className="text-slate-800 dark:text-white leading-tight">{level.title}</div>
+                   </div>
+                 </div>
+               );
+             })}
+           </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`min-h-screen flex flex-col font-sans ${state.isDark ? 'dark' : ''} bg-slate-50 dark:bg-slate-950`}>
+    <div className={`min-h-screen ${state.isDark ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-300`}>
       <TopBar />
-      
-      <main className="flex-1 container mx-auto p-4 pt-8">
-        
+
+      <main className="flex-1 container mx-auto p-4 flex flex-col">
         {state.mode === AppMode.HOME && (
-          <div className="max-w-2xl mx-auto space-y-8 pb-12">
+          <div className="max-w-4xl mx-auto w-full space-y-8 py-8 animate-slide-in">
             
-            {/* Header Map */}
-            <div className="text-center space-y-2 py-8">
-              <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500 gamify-font drop-shadow-sm">
-                World Map
-              </h1>
-              <p className="text-slate-400 font-bold uppercase tracking-widest">{UI_TEXT.start.en} / {UI_TEXT.start.ru} / {UI_TEXT.start.uz}</p>
-            </div>
-
-            {/* LEVEL 1: THE QUEST */}
-            <div className="relative group">
-               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-               <Card 
-                 onClick={() => updateState({ mode: AppMode.STUDENT })}
-                 className="relative cursor-pointer hover:scale-[1.02] transition-transform border-none bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-slate-900"
-               >
-                 <div className="flex items-center gap-6">
-                   <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-5xl shadow-inner">
-                     🗺️
-                   </div>
-                   <div className="flex-1">
-                     <div className="flex justify-between items-center mb-1">
-                        <h3 className="text-2xl font-black text-slate-800 dark:text-white">{UI_TEXT.studentMode.en}</h3>
-                        {state.boss.hp <= 0 && <span className="text-green-500 font-bold">COMPLETED ✅</span>}
-                     </div>
-                     <p className="text-slate-500 font-medium mb-4">
-                       Journey through the lands of Phrasal Verbs.
-                       {state.showRussian && <span className="block text-indigo-400 text-sm mt-1">{UI_TEXT.studentMode.ru}</span>}
-                       {state.showUzbek && <span className="block text-teal-400 text-sm mt-1">{UI_TEXT.studentMode.uz}</span>}
-                     </p>
-                     <ProgressBar current={state.boss.hp <= 0 ? 100 : state.boss.hp < 500 ? 50 : 0} total={100} color="bg-blue-500" />
-                   </div>
-                 </div>
-               </Card>
-            </div>
-
-            {/* LEVEL 2: THE ARENA */}
-            <div className="relative group">
-               <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-               <Card 
-                 onClick={() => updateState({ mode: AppMode.KAHOOT })}
-                 className="relative cursor-pointer hover:scale-[1.02] transition-transform border-none bg-gradient-to-br from-white to-purple-50 dark:from-slate-800 dark:to-slate-900"
-               >
-                 <div className="flex items-center gap-6">
-                   <div className="w-20 h-20 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center text-5xl shadow-inner">
-                     ⚔️
-                   </div>
-                   <div className="flex-1">
-                     <h3 className="text-2xl font-black text-slate-800 dark:text-white">{UI_TEXT.kahootMode.en}</h3>
-                     <p className="text-slate-500 font-medium">
-                       Ranked matches against time.
-                       {state.showRussian && <span className="block text-indigo-400 text-sm mt-1">{UI_TEXT.kahootMode.ru}</span>}
-                       {state.showUzbek && <span className="block text-teal-400 text-sm mt-1">{UI_TEXT.kahootMode.uz}</span>}
-                     </p>
-                   </div>
-                   <div className="text-right hidden sm:block">
-                     <div className="text-3xl font-black text-purple-600">{state.score}</div>
-                     <div className="text-xs font-bold text-slate-400 uppercase">High Score</div>
-                   </div>
-                 </div>
-               </Card>
-            </div>
-
-            {/* LEVEL 3: SPEAKING CORNER */}
-            <div className="relative group">
-               <div className="absolute -inset-1 bg-gradient-to-r from-pink-500 to-rose-500 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-               <Card 
-                 onClick={() => updateState({ mode: AppMode.SPEAKING })}
-                 className="relative cursor-pointer hover:scale-[1.02] transition-transform border-none bg-gradient-to-br from-white to-rose-50 dark:from-slate-800 dark:to-slate-900"
-               >
-                 <div className="flex items-center gap-6">
-                   <div className="w-20 h-20 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-5xl shadow-inner">
-                     🎙️
-                   </div>
-                   <div className="flex-1">
-                     <h3 className="text-2xl font-black text-slate-800 dark:text-white">{UI_TEXT.speakingMode.en}</h3>
-                     <p className="text-slate-500 font-medium">
-                       Practice speaking in context (Q.A.R.E. Method).
-                       {state.showRussian && <span className="block text-indigo-400 text-sm mt-1">{UI_TEXT.speakingMode.ru}</span>}
-                       {state.showUzbek && <span className="block text-teal-400 text-sm mt-1">{UI_TEXT.speakingMode.uz}</span>}
-                     </p>
-                   </div>
-                 </div>
-               </Card>
-            </div>
-
-            {/* LEVEL 4: THE LIBRARY */}
-            <Card 
-              onClick={() => updateState({ mode: AppMode.TEACHER })}
-              className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-2 border-dashed border-slate-300 dark:border-slate-700"
-            >
-              <div className="flex items-center gap-4 opacity-70 hover:opacity-100 transition-opacity">
-                <div className="text-3xl">📜</div>
-                <div>
-                  <h3 className="font-bold text-slate-700 dark:text-slate-300">{UI_TEXT.teacherMode.en}</h3>
-                  <p className="text-xs text-slate-500">Access lesson plans</p>
-                </div>
+            {/* Welcome Banner */}
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden">
+              <div className="relative z-10">
+                <h1 className="text-4xl md:text-5xl font-black mb-2 gamify-font">
+                   {UI_TEXT.welcome.en}, Student!
+                </h1>
+                <p className="opacity-90 text-lg mb-6 max-w-lg">
+                   Master Unit 55 Phrasal Verbs through interactive games, boss battles, and speaking challenges.
+                </p>
+                <Button 
+                   onClick={() => updateState({ mode: AppMode.STUDENT })} 
+                   variant="gold"
+                   className="shadow-xl"
+                >
+                   {UI_TEXT.start.en} ▶
+                </Button>
               </div>
-            </Card>
+              
+              {/* Decorative Background Elements */}
+              <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/4 blur-3xl"></div>
+              <div className="absolute bottom-0 right-10 text-9xl transform translate-y-1/4 rotate-12 opacity-20 select-none">🚀</div>
+            </div>
 
+            {/* Mode Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card 
+                onClick={() => updateState({ mode: AppMode.STUDENT })}
+                className="group cursor-pointer hover:border-primary border-transparent transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                     <Badge color="bg-green-100 text-green-800 mb-2">Adventure Mode</Badge>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">{UI_TEXT.studentMode.en}</h3>
+                     <p className="text-slate-500 text-sm">Follow the story, learn the rules, and defeat the boss.</p>
+                  </div>
+                  <div className="text-5xl group-hover:scale-125 transition-transform duration-300">🗺️</div>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => updateState({ mode: AppMode.CAMPAIGN_MENU })}
+                className="group cursor-pointer hover:border-blue-500 border-transparent transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                     <Badge color="bg-blue-100 text-blue-800 mb-2">Ranked Play</Badge>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">{UI_TEXT.campaignMode.en}</h3>
+                     <p className="text-slate-500 text-sm">Progress through 6 challenging levels of quizzes.</p>
+                  </div>
+                  <div className="text-5xl group-hover:scale-125 transition-transform duration-300">🏰</div>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => updateState({ mode: AppMode.SPEAKING })}
+                className="group cursor-pointer hover:border-pink-500 border-transparent transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                     <Badge color="bg-pink-100 text-pink-800 mb-2">Microphone Enabled</Badge>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">{UI_TEXT.speakingMode.en}</h3>
+                     <p className="text-slate-500 text-sm">Practice your pronunciation with speaking tasks.</p>
+                  </div>
+                  <div className="text-5xl group-hover:scale-125 transition-transform duration-300">🎙️</div>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => { setCurrentQuizQuestions(undefined); updateState({ mode: AppMode.KAHOOT }); }}
+                className="group cursor-pointer hover:border-purple-500 border-transparent transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                     <Badge color="bg-purple-100 text-purple-800 mb-2">Quick Play</Badge>
+                     <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">{UI_TEXT.kahootMode.en}</h3>
+                     <p className="text-slate-500 text-sm">Endless random questions. Test your speed!</p>
+                  </div>
+                  <div className="text-5xl group-hover:scale-125 transition-transform duration-300">⚡</div>
+                </div>
+              </Card>
+
+              <Card 
+                onClick={() => updateState({ mode: AppMode.TEACHER })}
+                className="group cursor-pointer hover:border-teal-500 border-transparent transition-all md:col-span-2 bg-slate-100 dark:bg-slate-900"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl group-hover:rotate-12 transition-transform">👨‍🏫</div>
+                  <div>
+                     <h3 className="text-xl font-bold text-slate-800 dark:text-white">{UI_TEXT.teacherMode.en}</h3>
+                     <p className="text-slate-500 text-xs">View lesson plan, TTT structure, and common errors.</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
         )}
 
         {state.mode === AppMode.STUDENT && (
-          <StudentMode 
-            state={state} 
-            updateState={updateState} 
-            onComplete={handleStudentComplete} 
-          />
+          <StudentMode state={state} updateState={updateState} onComplete={handleStudentComplete} />
         )}
 
-        {state.mode === AppMode.KAHOOT && (
-          <KahootMode 
-            onExit={handleKahootExit} 
-            showRussian={state.showRussian} 
-            showUzbek={state.showUzbek} 
-          />
+        {state.mode === AppMode.TEACHER && (
+          <div className="space-y-4">
+             <Button onClick={() => updateState({ mode: AppMode.HOME })} variant="secondary">⬅️ Back to Menu</Button>
+             <TeacherMode />
+          </div>
         )}
 
         {state.mode === AppMode.SPEAKING && (
           <SpeakingMode 
-            onExit={() => updateState({ mode: AppMode.HOME })}
+            onExit={() => updateState({ mode: AppMode.HOME })} 
             showRussian={state.showRussian}
             showUzbek={state.showUzbek}
             updateState={updateState}
             score={state.score}
           />
         )}
-
-        {state.mode === AppMode.TEACHER && (
-          <TeacherMode />
-        )}
-
       </main>
     </div>
   );

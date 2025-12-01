@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { KAHOOT_QUESTIONS, UI_TEXT } from '../constants';
 import { Button, Card, Toast, playSound } from './UI';
+import { QuizQuestion } from '../types';
 
 interface Props {
-  onExit: (score: number) => void;
+  onExit: (score: number, passed: boolean) => void;
   showRussian: boolean;
   showUzbek: boolean;
+  customQuestions?: QuizQuestion[]; // Optional prop for specific quiz sets
 }
 
-export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) => {
+export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek, customQuestions }) => {
   const [qIndex, setQIndex] = useState(0);
   const [timer, setTimer] = useState(15);
   const [score, setScore] = useState(0);
@@ -17,6 +19,10 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
   const [selected, setSelected] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
+
+  // Use custom questions if provided, otherwise default to the full arena list
+  const activeQuestions = customQuestions || KAHOOT_QUESTIONS;
 
   useEffect(() => {
     if (timer > 0 && !showResult && !isFinished) {
@@ -38,7 +44,7 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
     setSelected(index);
     setShowResult(true);
     
-    const isCorrect = index === KAHOOT_QUESTIONS[qIndex].correctAnswer;
+    const isCorrect = index === activeQuestions[qIndex].correctAnswer;
     
     if (isCorrect) {
       playSound('success');
@@ -46,6 +52,7 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
       const points = Math.round((1000 + (timer * 50)) * multiplier);
       setScore(s => s + points);
       setStreak(s => s + 1);
+      setCorrectCount(c => c + 1);
     } else {
       playSound('error');
       setStreak(0);
@@ -53,7 +60,7 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
   };
 
   const nextQuestion = () => {
-    if (qIndex < KAHOOT_QUESTIONS.length - 1) {
+    if (qIndex < activeQuestions.length - 1) {
       setQIndex(q => q + 1);
       setTimer(15);
       setShowResult(false);
@@ -66,17 +73,22 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
   };
 
   if (isFinished) {
+    // 70% to pass if it's a campaign, or just general score for arena
+    const passThreshold = Math.floor(activeQuestions.length * 0.7);
+    const passed = correctCount >= passThreshold;
+
     return (
       <div className="min-h-screen bg-indigo-900 flex flex-col items-center justify-center p-4">
-        <div className="text-9xl animate-pop mb-4">👑</div>
-        <h1 className="text-6xl font-black text-white mb-4 gamify-font">{UI_TEXT.victory.en}</h1>
+        <div className="text-9xl animate-pop mb-4">{passed ? '👑' : '🥺'}</div>
+        <h1 className="text-6xl font-black text-white mb-4 gamify-font">{passed ? UI_TEXT.victory.en : UI_TEXT.gameOver.en}</h1>
+        <div className="text-2xl text-slate-300 mb-2">Accuracy: {correctCount} / {activeQuestions.length}</div>
         <div className="text-4xl text-yellow-400 font-bold mb-8">{UI_TEXT.score.en}: {score}</div>
-        <Button variant="gold" onClick={() => onExit(score)}>{UI_TEXT.continue.en}</Button>
+        <Button variant="gold" onClick={() => onExit(score, passed)}>{UI_TEXT.continue.en}</Button>
       </div>
     );
   }
 
-  const currentQ = KAHOOT_QUESTIONS[qIndex];
+  const currentQ = activeQuestions[qIndex];
   const colors = ["bg-red-500", "bg-blue-500", "bg-yellow-500", "bg-green-500"];
   const shapes = ["▲", "◆", "●", "■"];
 
@@ -93,7 +105,7 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
 
       {/* Header */}
       <div className="w-full max-w-4xl flex justify-between text-white text-xl font-bold mb-8 mt-4">
-        <div className="bg-white/10 backdrop-blur px-6 py-2 rounded-full border border-white/20">{qIndex + 1} / {KAHOOT_QUESTIONS.length}</div>
+        <div className="bg-white/10 backdrop-blur px-6 py-2 rounded-full border border-white/20">{qIndex + 1} / {activeQuestions.length}</div>
         <div className="bg-white/10 backdrop-blur px-6 py-2 rounded-full border border-white/20">💎 {score}</div>
       </div>
 
@@ -146,7 +158,7 @@ export const KahootMode: React.FC<Props> = ({ onExit, showRussian, showUzbek }) 
                {showUzbek && <p className="text-teal-300 text-sm">{currentQ.explanationUz}</p>}
              </div>
              <Button onClick={nextQuestion} variant="gold" className="w-full text-xl">
-               {qIndex < KAHOOT_QUESTIONS.length - 1 ? UI_TEXT.continue.en : UI_TEXT.continue.en}
+               {qIndex < activeQuestions.length - 1 ? UI_TEXT.continue.en : UI_TEXT.continue.en}
              </Button>
           </div>
         )}

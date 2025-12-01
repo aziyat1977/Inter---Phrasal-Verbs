@@ -1,5 +1,5 @@
 
-import { LessonSection, QuizQuestion, Achievement, DiscoveryPair, SpeakingQuestion } from './types';
+import { LessonSection, QuizQuestion, DiscoveryPair, SpeakingQuestion, CampaignLevel } from './types';
 
 export const UI_TEXT: Record<string, { en: string, ru: string, uz: string }> = {
   welcome: { en: "Welcome", ru: "Добро пожаловать", uz: "Xush kelibsiz" },
@@ -18,6 +18,7 @@ export const UI_TEXT: Record<string, { en: string, ru: string, uz: string }> = {
   teacherMode: { en: "Teacher Dashboard", ru: "Панель учителя", uz: "O'qituvchi paneli" },
   studentMode: { en: "Student Adventure", ru: "Приключение", uz: "Talaba sarguzashti" },
   kahootMode: { en: "The Arena", ru: "Арена", uz: "Arena" },
+  campaignMode: { en: "Campaign", ru: "Кампания", uz: "Kampaniya" },
   speakingMode: { en: "Speaking Corner", ru: "Разговорный клуб", uz: "So'zlashuv burchagi" },
   memoryMatch: { en: "Memory Match", ru: "Найди пару", uz: "Xotira o'yini" },
   locked: { en: "Locked", ru: "Закрыто", uz: "Qulflangan" },
@@ -145,72 +146,102 @@ export const LESSON_DATA: LessonSection[] = [
         interactiveTarget: "it"
       }
     ]
+  },
+  {
+    title: "55.4 Three-Part Verbs",
+    subtitle: "Advanced Complexity",
+    content: [
+      {
+        id: "tp1",
+        type: "definition",
+        en: "Some verbs have TWO particles. They are never separable.",
+        ru: "У некоторых глаголов ДВЕ частицы. Они никогда не разделяются.",
+        uz: "Ba'zi fe'llarda IKKITA yuklama bor. Ular hech qachon ajralmaydi.",
+        image: "3️⃣"
+      },
+      {
+        id: "ex_tp1",
+        type: "example",
+        en: "I look forward to the party.",
+        ru: "Я с нетерпением жду вечеринки.",
+        uz: "Men bazmni intizorlik bilan kutaman.",
+        image: "🎉",
+        highlight: ["forward", "to"],
+        interactiveTarget: "to"
+      },
+      {
+        id: "ex_tp2",
+        type: "example",
+        en: "I get along with my sister.",
+        ru: "Я лажу со своей сестрой.",
+        uz: "Men singlim bilan chiqishaman.",
+        image: "🤝",
+        highlight: ["along", "with"],
+        interactiveTarget: "along"
+      }
+    ]
   }
 ];
 
-export const KAHOOT_QUESTIONS: QuizQuestion[] = [
-  {
-    id: "q1",
-    question: "I usually ____ up at 7:00 AM.",
-    options: ["getting", "get", "gets", "got"],
-    correctAnswer: 1,
-    explanation: "Present Simple: I get up.",
-    explanationRu: "Present Simple: I get up (Я встаю).",
-    explanationUz: "Present Simple: I get up (Men turaman)."
-  },
-  {
-    id: "q2",
-    question: "She ____ out at the gym yesterday.",
-    options: ["work", "works", "worked", "working"],
-    correctAnswer: 2,
-    explanation: "Past Simple requires 'worked'.",
-    explanationRu: "Past Simple требует 'worked'.",
-    explanationUz: "O'tgan zamon (Past Simple) 'worked' talab qiladi."
-  },
-  {
-    id: "q3",
-    question: "Can you turn ____ the light?",
-    options: ["on", "in", "at", "by"],
-    correctAnswer: 0,
-    explanation: "'Turn on' means to activate.",
-    explanationRu: "'Turn on' означает включить.",
-    explanationUz: "'Turn on' yoqish ma'nosini bildiradi."
-  },
-  {
-    id: "q4",
-    question: "Please pick ____.",
-    options: ["up it", "it up", "it on", "on it"],
-    correctAnswer: 1,
-    explanation: "With pronouns (it), the object MUST go in the middle.",
-    explanationRu: "С местоимениями (it) объект ДОЛЖЕН быть посередине.",
-    explanationUz: "Olmoshlar (it) bilan to'ldiruvchi o'rtada bo'lishi SHART."
-  },
-  {
-    id: "q5",
-    question: "We ran ____ of coffee!",
-    options: ["away", "in", "out", "over"],
-    correctAnswer: 2,
-    explanation: "'Run out of' means to have none left.",
-    explanationRu: "'Run out of' означает, что что-то закончилось.",
-    explanationUz: "'Run out of' tugab qolishni anglatadi."
-  }
+// --- GENERATING THE MASSIVE QUESTION POOL ---
+
+const BASE_QUESTIONS: QuizQuestion[] = [
+  // Original 5
+  { id: "q1", question: "I usually ____ up at 7:00 AM.", options: ["getting", "get", "gets", "got"], correctAnswer: 1, explanation: "Present Simple: I get up.", explanationRu: "Я встаю.", explanationUz: "Men turaman." },
+  { id: "q2", question: "She ____ out at the gym yesterday.", options: ["work", "works", "worked", "working"], correctAnswer: 2, explanation: "Past Simple: worked.", explanationRu: "Прошедшее время.", explanationUz: "O'tgan zamon." },
+  { id: "q3", question: "Can you turn ____ the light?", options: ["on", "in", "at", "by"], correctAnswer: 0, explanation: "Turn on = activate.", explanationRu: "Включить.", explanationUz: "Yoqmoq." },
+  { id: "q4", question: "Please pick ____.", options: ["up it", "it up", "it on", "on it"], correctAnswer: 1, explanation: "Pronoun 'it' goes in the middle.", explanationRu: "Местоимение посередине.", explanationUz: "Olmosh o'rtada." },
+  { id: "q5", question: "We ran ____ of coffee!", options: ["away", "in", "out", "over"], correctAnswer: 2, explanation: "Run out of = have none left.", explanationRu: "Закончилось.", explanationUz: "Tugab qoldi." },
 ];
+
+const NEW_QUESTIONS: QuizQuestion[] = [
+  { id: "nq1", question: "I can't ____ up with this noise anymore!", options: ["put", "get", "let", "make"], correctAnswer: 0, explanation: "Put up with = tolerate.", explanationRu: "Терпеть.", explanationUz: "Chidamoq." },
+  { id: "nq2", question: "Don't ____ up! You can do it!", options: ["give", "go", "get", "grow"], correctAnswer: 0, explanation: "Give up = quit.", explanationRu: "Сдаваться.", explanationUz: "Taslim bo'lmoq." },
+  { id: "nq3", question: "The plane will ____ off in 5 minutes.", options: ["take", "get", "fly", "go"], correctAnswer: 0, explanation: "Take off = depart (for planes).", explanationRu: "Взлетать.", explanationUz: "Uchib ketmoq." },
+  { id: "nq4", question: "I need to ____ for my keys.", options: ["look", "see", "watch", "view"], correctAnswer: 0, explanation: "Look for = search.", explanationRu: "Искать.", explanationUz: "Qidirmoq." },
+  { id: "nq5", question: "Can you ____ after my dog while I'm away?", options: ["look", "take", "get", "run"], correctAnswer: 0, explanation: "Look after = take care of.", explanationRu: "Присматривать.", explanationUz: "G'amxo'rlik qilmoq." },
+  { id: "nq6", question: "The meeting was ____ off due to rain.", options: ["called", "made", "turned", "gone"], correctAnswer: 0, explanation: "Call off = cancel.", explanationRu: "Отменять.", explanationUz: "Bekor qilmoq." },
+  { id: "nq7", question: "I ____ into an old friend yesterday.", options: ["ran", "walked", "jumped", "saw"], correctAnswer: 0, explanation: "Run into = meet unexpectedly.", explanationRu: "Случайно встретить.", explanationUz: "Duch kelmoq." },
+  { id: "nq8", question: "Please ____ on your coat, it's cold.", options: ["put", "get", "take", "have"], correctAnswer: 0, explanation: "Put on = dress.", explanationRu: "Надевать.", explanationUz: "Kiymoq." },
+  { id: "nq9", question: "You should ____ down sugar to lose weight.", options: ["cut", "chop", "break", "let"], correctAnswer: 0, explanation: "Cut down on = reduce.", explanationRu: "Сократить потребление.", explanationUz: "Kamaytirmoq." },
+  { id: "nq10", question: "Did you ____ up the story?", options: ["make", "do", "get", "take"], correctAnswer: 0, explanation: "Make up = invent/create.", explanationRu: "Выдумывать.", explanationUz: "To'qib chiqarmoq." },
+  { id: "nq11", question: "The car ____ down on the highway.", options: ["broke", "fell", "went", "crash"], correctAnswer: 0, explanation: "Break down = stop working (machine).", explanationRu: "Сломаться.", explanationUz: "Buzilib qolmoq." },
+  { id: "nq12", question: "I ____ up early even on Sundays.", options: ["get", "stand", "rise", "go"], correctAnswer: 0, explanation: "Get up = leave bed.", explanationRu: "Вставать.", explanationUz: "O'rnidan turmoq." },
+  { id: "nq13", question: "Never ____ down on people.", options: ["look", "see", "go", "take"], correctAnswer: 0, explanation: "Look down on = feel superior to.", explanationRu: "Смотреть свысока.", explanationUz: "Mensimaslik." },
+  { id: "nq14", question: "I really ____ up to my father.", options: ["look", "see", "watch", "go"], correctAnswer: 0, explanation: "Look up to = admire/respect.", explanationRu: "Уважать.", explanationUz: "Hurmat qilmoq." },
+  { id: "nq15", question: "The bomb might ____ off!", options: ["go", "fly", "take", "run"], correctAnswer: 0, explanation: "Go off = explode.", explanationRu: "Взорваться.", explanationUz: "Portlamoq." },
+  { id: "nq16", question: "Can you ____ me up at the station?", options: ["pick", "take", "get", "bring"], correctAnswer: 0, explanation: "Pick up = collect someone.", explanationRu: "Забрать.", explanationUz: "Olib ketmoq." },
+  { id: "nq17", question: "The milk has ____ off.", options: ["gone", "been", "turned", "run"], correctAnswer: 0, explanation: "Go off = become bad (food).", explanationRu: "Испортиться.", explanationUz: "Aynib qolmoq." },
+  { id: "nq18", question: "Hold ____ a minute, please.", options: ["on", "in", "at", "up"], correctAnswer: 0, explanation: "Hold on = wait.", explanationRu: "Подождать.", explanationUz: "Kutib turmoq." },
+  { id: "nq19", question: "The firemen ____ out the fire.", options: ["put", "get", "took", "made"], correctAnswer: 0, explanation: "Put out = extinguish.", explanationRu: "Тушить.", explanationUz: "O'chirmoq." },
+  { id: "nq20", question: "I want to ____ up a new hobby.", options: ["take", "get", "make", "do"], correctAnswer: 0, explanation: "Take up = start a hobby.", explanationRu: "Начать заниматься.", explanationUz: "Shug'ullanishni boshlamoq." },
+  { id: "nq21", question: "____ out! There's a car coming.", options: ["Watch", "See", "Look", "View"], correctAnswer: 0, explanation: "Watch out = be careful.", explanationRu: "Осторожно!", explanationUz: "Ehtiyot bo'l!" },
+  { id: "nq22", question: "I need to ____ in at the hotel.", options: ["check", "get", "sign", "log"], correctAnswer: 0, explanation: "Check in = register arrival.", explanationRu: "Зарегистрироваться.", explanationUz: "Ro'yxatdan o'tmoq." },
+  { id: "nq23", question: "Let's ____ out tonight.", options: ["eat", "food", "cook", "meal"], correctAnswer: 0, explanation: "Eat out = eat at a restaurant.", explanationRu: "Есть в ресторане.", explanationUz: "Ko'chada ovqatlanmoq." },
+  { id: "nq24", question: "Please ____ out this form.", options: ["fill", "write", "do", "make"], correctAnswer: 0, explanation: "Fill out/in = complete a form.", explanationRu: "Заполнить.", explanationUz: "To'ldirmoq." },
+  { id: "nq25", question: "He ____ up smoking last year.", options: ["gave", "took", "put", "let"], correctAnswer: 0, explanation: "Give up = stop a habit.", explanationRu: "Бросить (привычку).", explanationUz: "Tashlamoq (odatni)." },
+  { id: "nq26", question: "I can't ____ it out.", options: ["figure", "do", "make", "take"], correctAnswer: 0, explanation: "Figure out = understand/solve.", explanationRu: "Понять/Решить.", explanationUz: "Tushunib yetmoq." },
+  { id: "nq27", question: "Don't let me ____.", options: ["down", "up", "in", "off"], correctAnswer: 0, explanation: "Let down = disappoint.", explanationRu: "Подвести.", explanationUz: "Uyatga qo'ymoq." },
+  { id: "nq28", question: "The thief ____ away with the money.", options: ["got", "run", "took", "went"], correctAnswer: 0, explanation: "Get away = escape.", explanationRu: "Сбежать.", explanationUz: "Qochib qolmoq." },
+  { id: "nq29", question: "Turn ____ the music, it's too loud!", options: ["down", "up", "in", "out"], correctAnswer: 0, explanation: "Turn down = reduce volume.", explanationRu: "Убавить (звук).", explanationUz: "Pasaytirmoq." },
+  { id: "nq30", question: "Turn ____ the volume, I can't hear.", options: ["up", "down", "in", "out"], correctAnswer: 0, explanation: "Turn up = increase volume.", explanationRu: "Прибавить (звук).", explanationUz: "Ko'tarmoq (ovozni)." },
+  { id: "nq31", question: "She ____ after her mother.", options: ["takes", "gets", "looks", "goes"], correctAnswer: 0, explanation: "Take after = resemble.", explanationRu: "Быть похожим.", explanationUz: "O'xshamoq." },
+  { id: "nq32", question: "We need to ____ up the house.", options: ["clean", "do", "make", "get"], correctAnswer: 0, explanation: "Clean up = make tidy.", explanationRu: "Убраться.", explanationUz: "Tozalamoq." },
+  { id: "nq33", question: "Did you ____ back the money?", options: ["pay", "give", "take", "get"], correctAnswer: 0, explanation: "Pay back = return money.", explanationRu: "Вернуть долг.", explanationUz: "Qaytarib to'lamoq." },
+  { id: "nq34", question: "The deal ____ through.", options: ["fell", "went", "got", "came"], correctAnswer: 0, explanation: "Fall through = fail to happen.", explanationRu: "Сорваться (о сделке).", explanationUz: "Amalga oshmay qolmoq." }
+];
+
+export const KAHOOT_QUESTIONS = [...BASE_QUESTIONS, ...NEW_QUESTIONS];
 
 export const DISCOVERY_PAIRS: DiscoveryPair[] = [
-  { id: '1', verb: 'Get up', meaning: 'Leave bed', meaningRu: 'Вставать с постели', meaningUz: 'O\'rnidan turmoq' },
-  { id: '2', verb: 'Work out', meaning: 'Exercise', meaningRu: 'Тренироваться', meaningUz: 'Mashq qilmoq' },
-  { id: '3', verb: 'Run out of', meaning: 'Have none left', meaningRu: 'Заканчиваться', meaningUz: 'Tugab qolmoq' },
-  { id: '4', verb: 'Look up to', meaning: 'Respect', meaningRu: 'Уважать', meaningUz: 'Hurmat qilmoq' },
-  { id: '5', verb: 'Turn up', meaning: 'Arrive late', meaningRu: 'Появляться (внезапно)', meaningUz: 'Paydo bo\'lmoq' },
-  { id: '6', verb: 'Chill out', meaning: 'Relax', meaningRu: 'Расслабляться', meaningUz: 'Dam olmoq' },
-];
-
-export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first_blood', title: 'First Steps', icon: '👶', description: 'Complete your first lesson.' },
-  { id: 'boss_slayer', title: 'Boss Slayer', icon: '⚔️', description: 'Defeat the Phrasal Phantom.' },
-  { id: 'streak_master', title: 'On Fire', icon: '🔥', description: 'Get a 5x Streak in Kahoot.' },
-  { id: 'scholar', title: 'Scholar', icon: '📜', description: 'Use Teacher Mode.' },
-  { id: 'orator', title: 'Orator', icon: '🎙️', description: 'Practice 10 Speaking Questions.' },
+  { id: '1', verb: 'Get up', meaning: 'Leave bed', meaningRu: 'Вставать с постели', meaningUz: "O'rnidan turmoq" },
+  { id: '2', verb: 'Give up', meaning: 'Quit/Stop', meaningRu: 'Сдаваться/Бросать', meaningUz: "Taslim bo'lmoq" },
+  { id: '3', verb: 'Look for', meaning: 'Search', meaningRu: 'Искать', meaningUz: "Qidirmoq" },
+  { id: '4', verb: 'Turn on', meaning: 'Start machine', meaningRu: 'Включать', meaningUz: "Yoqmoq" },
+  { id: '5', verb: 'Run out', meaning: 'Have none left', meaningRu: 'Заканчиваться', meaningUz: "Tugab qolmoq" },
+  { id: '6', verb: 'Put off', meaning: 'Postpone', meaningRu: 'Откладывать', meaningUz: "Keyinga qoldirmoq" },
+  { id: '7', verb: 'Take off', meaning: 'Depart (plane)', meaningRu: 'Взлетать', meaningUz: "Uchib ketmoq" },
+  { id: '8', verb: 'Get on', meaning: 'Enter bus/train', meaningRu: 'Садиться (транспорт)', meaningUz: "Chiqmoq (transportga)" }
 ];
 
 export const BOSS_CONFIG = {
@@ -221,687 +252,79 @@ export const BOSS_CONFIG = {
 };
 
 export const SPEAKING_QUESTIONS: SpeakingQuestion[] = [
-  // --- DAILY ROUTINE (Original 8) ---
   {
-    id: 's1', category: 'Daily Routine',
-    question: "What time do you usually get up?",
-    targetVerb: { en: "get up", ru: "вставать", uz: "o'rnidan turmoq" },
-    modelAnswer: { answer: "I usually get up at 7:00 AM.", reason: "Because I have classes in the morning.", example: "On weekends, however, I get up at 10 AM." }
-  },
-  {
-    id: 's2', category: 'Daily Routine',
-    question: "Do you wake up easily in the morning?",
-    targetVerb: { en: "wake up", ru: "просыпаться", uz: "uyg'onmoq" },
-    modelAnswer: { answer: "No, I don't wake up easily.", reason: "I love sleeping too much.", example: "I usually set three alarms to wake up." }
-  },
-  {
-    id: 's3', category: 'Daily Routine',
-    question: "Do you switch on the TV when you eat breakfast?",
-    targetVerb: { en: "switch on", ru: "включать", uz: "yoqmoq" },
-    modelAnswer: { answer: "I never switch on the TV.", reason: "I prefer to check my phone.", example: "I switch on YouTube on my phone instead." }
-  },
-  {
-    id: 's4', category: 'Daily Routine',
-    question: "What do you put on for school or work?",
-    targetVerb: { en: "put on", ru: "надевать", uz: "kymoq" },
-    modelAnswer: { answer: "I put on my uniform.", reason: "It is a rule at my school.", example: "Sometimes I put on a jacket if it is cold." }
-  },
-  {
-    id: 's5', category: 'Daily Routine',
-    question: "How often do you eat out with your family?",
-    targetVerb: { en: "eat out", ru: "есть вне дома", uz: "ko'chada ovqatlanmoq" },
-    modelAnswer: { answer: "We eat out once a week.", reason: "My mom likes to rest on Sundays.", example: "We usually eat out at a pizza place." }
-  },
-  {
-    id: 's6', category: 'Daily Routine',
-    question: "Do you clean up your room every day?",
-    targetVerb: { en: "clean up", ru: "убирать", uz: "tozalamoq" },
-    modelAnswer: { answer: "I clean up my room every evening.", reason: "I like it to be tidy.", example: "I clean up my desk after homework." }
-  },
-  {
-    id: 's7', category: 'Daily Routine',
-    question: "What time do you usually go out to school?",
-    targetVerb: { en: "go out", ru: "выходить", uz: "chiqib ketmoq" },
-    modelAnswer: { answer: "I go out at 8:00 AM.", reason: "The bus comes at 8:15.", example: "My brother goes out with me." }
-  },
-  {
-    id: 's8', category: 'Daily Routine',
-    question: "When do you come back home?",
-    targetVerb: { en: "come back", ru: "возвращаться", uz: "qaytib kelmoq" },
-    modelAnswer: { answer: "I come back at 3:00 PM.", reason: "School finishes at 2:30.", example: "On Fridays, I come back later." }
-  },
-
-  // --- DAILY ROUTINE (New 10) ---
-  {
-    id: 's51', category: 'Daily Routine',
-    question: "Does your alarm go off loudly?",
-    targetVerb: { en: "go off", ru: "срабатывать (о будильнике)", uz: "jiringlamoq" },
-    modelAnswer: { answer: "Yes, my alarm goes off very loudly.", reason: "I am a heavy sleeper.", example: "It goes off at 6 AM sharp." }
-  },
-  {
-    id: 's52', category: 'Daily Routine',
-    question: "Do you sleep in on Sundays?",
-    targetVerb: { en: "sleep in", ru: "поспать подольше", uz: "kechgacha uxlamoq" },
-    modelAnswer: { answer: "I always sleep in on Sundays.", reason: "I am tired from the week.", example: "I usually sleep in until 11 AM." }
-  },
-  {
-    id: 's53', category: 'Daily Routine',
-    question: "Do you hurry up when you are late?",
-    targetVerb: { en: "hurry up", ru: "торопиться", uz: "shoshilmoq" },
-    modelAnswer: { answer: "I always hurry up in the morning.", reason: "I don't want to miss the bus.", example: "I hurry up to eat my breakfast." }
-  },
-  {
-    id: 's54', category: 'Daily Routine',
-    question: "Do you put away your clothes at night?",
-    targetVerb: { en: "put away", ru: "убирать на место", uz: "joyiga olib qo'ymoq" },
-    modelAnswer: { answer: "I put away my clothes before bed.", reason: "I like a clean room.", example: "I put away my jacket in the closet." }
-  },
-  {
-    id: 's55', category: 'Daily Routine',
-    question: "Who drops you off at school?",
-    targetVerb: { en: "drop off", ru: "высаживать / завозить", uz: "tashlab o'tmoq" },
-    modelAnswer: { answer: "My dad drops me off.", reason: "His work is near my school.", example: "He drops me off at the gate." }
-  },
-  {
-    id: 's56', category: 'Daily Routine',
-    question: "Who picks you up after classes?",
-    targetVerb: { en: "pick up", ru: "забирать", uz: "olib ketmoq" },
-    modelAnswer: { answer: "My mom picks me up.", reason: "She finishes work at 3 PM.", example: "She picks me up in her blue car." }
-  },
-  {
-    id: 's57', category: 'Daily Routine',
-    question: "What time do you set off for school?",
-    targetVerb: { en: "set off", ru: "отправляться", uz: "yo'lga tushmoq" },
-    modelAnswer: { answer: "I set off at 7:30.", reason: "It is a 30-minute walk.", example: "I set off with my neighbor." }
-  },
-  {
-    id: 's58', category: 'Daily Routine',
-    question: "Do you lie down for a nap in the afternoon?",
-    targetVerb: { en: "lie down", ru: "прилечь", uz: "yotib dam olmoq" },
-    modelAnswer: { answer: "I sometimes lie down.", reason: "I get tired after sports.", example: "I lie down for 20 minutes." }
-  },
-  {
-    id: 's59', category: 'Daily Routine',
-    question: "Do you stay up late on Fridays?",
-    targetVerb: { en: "stay up", ru: "не спать допоздна", uz: "tunga qadar uxlamaslik" },
-    modelAnswer: { answer: "I stay up very late.", reason: "I play games with friends.", example: "I stay up until 2 AM." }
-  },
-  {
-    id: 's60', category: 'Daily Routine',
-    question: "Do you doze off in class?",
-    targetVerb: { en: "doze off", ru: "задремать", uz: "mudrab qolmoq" },
-    modelAnswer: { answer: "I never doze off.", reason: "My teachers are strict.", example: "If I am tired, I drink water so I don't doze off." }
-  },
-
-  // --- FREE TIME (Original 8) ---
-  {
-    id: 's9', category: 'Free Time',
-    question: "Who do you usually hang out with?",
-    targetVerb: { en: "hang out", ru: "тусоваться / проводить время", uz: "vaqt o'tkazmoq" },
-    modelAnswer: { answer: "I hang out with my best friend.", reason: "We live on the same street.", example: "We hang out in the park." }
-  },
-  {
-    id: 's10', category: 'Free Time',
-    question: "Do you invite friends over to your house?",
-    targetVerb: { en: "invite over", ru: "приглашать в гости", uz: "mehmonga chaqirmoq" },
-    modelAnswer: { answer: "I invite friends over on Saturdays.", reason: "We play video games together.", example: "I invite over my cousins too." }
-  },
-  {
-    id: 's11', category: 'Free Time',
-    question: "Do you prefer to go out or stay in?",
-    targetVerb: { en: "stay in", ru: "оставаться дома", uz: "uyda qolmoq" },
-    modelAnswer: { answer: "I prefer to stay in.", reason: "I like watching Netflix.", example: "I stay in when it rains." }
-  },
-  {
-    id: 's12', category: 'Free Time',
-    question: "How do you chill out after school?",
-    targetVerb: { en: "chill out", ru: "расслабляться", uz: "hordiq chiqarmoq" },
-    modelAnswer: { answer: "I chill out by listening to music.", reason: "It helps me relax.", example: "I chill out on the sofa." }
-  },
-  {
-    id: 's13', category: 'Free Time',
-    question: "Do you dress up for parties?",
-    targetVerb: { en: "dress up", ru: "наряжаться", uz: "yasamoq / kiyinmoq" },
-    modelAnswer: { answer: "I dress up for birthdays.", reason: "It is fun to look nice.", example: "I dress up in a suit sometimes." }
-  },
-  {
-    id: 's14', category: 'Free Time',
-    question: "What hobbies are you looking for?",
-    targetVerb: { en: "look for", ru: "искать", uz: "qidirmoq" },
-    modelAnswer: { answer: "I look for creative hobbies.", reason: "I want to learn to paint.", example: "I look for tutorials online." }
-  },
-  {
-    id: 's15', category: 'Free Time',
-    question: "Do you call back if you miss a call?",
-    targetVerb: { en: "call back", ru: "перезванивать", uz: "qaytarib qo'ng'iroq qilmoq" },
-    modelAnswer: { answer: "I always call back.", reason: "It might be important.", example: "I call back my mom immediately." }
-  },
-  {
-    id: 's16', category: 'Free Time',
-    question: "Do you catch up with old friends often?",
-    targetVerb: { en: "catch up", ru: "наверстывать / болтать", uz: "suhbatlashmoq" },
-    modelAnswer: { answer: "I catch up with them online.", reason: "They live far away.", example: "We catch up via Zoom." }
-  },
-
-  // --- FREE TIME (New 10) ---
-  {
-    id: 's61', category: 'Free Time',
-    question: "Do you call up your friends on weekends?",
-    targetVerb: { en: "call up", ru: "звонить", uz: "telefon qilmoq" },
-    modelAnswer: { answer: "I call up my friends on Saturday.", reason: "We plan our day.", example: "I call up John to see if he is free." }
-  },
-  {
-    id: 's62', category: 'Free Time',
-    question: "Where do you meet up with friends?",
-    targetVerb: { en: "meet up", ru: "встречаться", uz: "uchrashmoq" },
-    modelAnswer: { answer: "We meet up at the mall.", reason: "There are many things to do.", example: "We meet up near the cinema." }
-  },
-  {
-    id: 's63', category: 'Free Time',
-    question: "How often do you get together with family?",
-    targetVerb: { en: "get together", ru: "собираться вместе", uz: "yig'ilishmoq" },
-    modelAnswer: { answer: "We get together every holiday.", reason: "Family is important.", example: "We get together for big dinners." }
-  },
-  {
-    id: 's64', category: 'Free Time',
-    question: "Do you drop in on your neighbors?",
-    targetVerb: { en: "drop in", ru: "заскочить (в гости)", uz: "kirib o'tmoq" },
-    modelAnswer: { answer: "I drop in sometimes.", reason: "They are very friendly.", example: "I drop in to give them cake." }
-  },
-  {
-    id: 's65', category: 'Free Time',
-    question: "Do you eat in or go out on Fridays?",
-    targetVerb: { en: "eat in", ru: "есть дома", uz: "uyda ovqatlanmoq" },
-    modelAnswer: { answer: "We usually eat in.", reason: "My mom cooks well.", example: "We eat in and watch a movie." }
-  },
-  {
-    id: 's66', category: 'Free Time',
-    question: "Do you look around shops without buying?",
-    targetVerb: { en: "look around", ru: "осматриваться", uz: "aylanib qaramoq" },
-    modelAnswer: { answer: "I look around the tech store.", reason: "I like new gadgets.", example: "I look around but everything is expensive." }
-  },
-  {
-    id: 's67', category: 'Free Time',
-    question: "Do you try on clothes before buying?",
-    targetVerb: { en: "try on", ru: "примерять", uz: "kiyib ko'rmoq" },
-    modelAnswer: { answer: "I always try on jeans.", reason: "Sizes are different.", example: "I try on three pairs usually." }
-  },
-  {
-    id: 's68', category: 'Free Time',
-    question: "Do you take off your shoes at home?",
-    targetVerb: { en: "take off", ru: "снимать (одежду)", uz: "yechmoq" },
-    modelAnswer: { answer: "I take off my shoes at the door.", reason: "It keeps the floor clean.", example: "I take off my coat too." }
-  },
-  {
-    id: 's69', category: 'Free Time',
-    question: "Where do you sit down in the park?",
-    targetVerb: { en: "sit down", ru: "садиться", uz: "o'tirmoq" },
-    modelAnswer: { answer: "I sit down on a bench.", reason: "I like to watch the birds.", example: "I sit down under a big tree." }
-  },
-  {
-    id: 's70', category: 'Free Time',
-    question: "Do you stand up when a teacher enters?",
-    targetVerb: { en: "stand up", ru: "вставать", uz: "turmoq" },
-    modelAnswer: { answer: "We stand up every time.", reason: "It shows respect.", example: "We stand up and say 'Good Morning'." }
-  },
-
-  // --- SPORTS (Original 8) ---
-  {
-    id: 's17', category: 'Sports',
-    question: "How often do you work out?",
-    targetVerb: { en: "work out", ru: "тренироваться", uz: "shug'ullanmoq" },
-    modelAnswer: { answer: "I work out three times a week.", reason: "I want to be strong.", example: "I work out at the gym." }
-  },
-  {
-    id: 's18', category: 'Sports',
-    question: "Do you warm up before exercising?",
-    targetVerb: { en: "warm up", ru: "разминаться", uz: "qizib olmoq" },
-    modelAnswer: { answer: "I always warm up.", reason: "It prevents injuries.", example: "I warm up by running slowly." }
-  },
-  {
-    id: 's19', category: 'Sports',
-    question: "Do you join in when people play soccer?",
-    targetVerb: { en: "join in", ru: "присоединяться", uz: "qo'shilmoq" },
-    modelAnswer: { answer: "I join in if I have time.", reason: "I love soccer.", example: "I join in games at the park." }
-  },
-  {
-    id: 's20', category: 'Sports',
-    question: "Do you give up easily when sports are hard?",
-    targetVerb: { en: "give up", ru: "сдаваться", uz: "taslim bo'lmoq" },
-    modelAnswer: { answer: "I never give up.", reason: "I am very competitive.", example: "I don't give up even if I am losing." }
-  },
-  {
-    id: 's21', category: 'Sports',
-    question: "Do you cool down after running?",
-    targetVerb: { en: "cool down", ru: "остывать", uz: "sovumoq / dam olmoq" },
-    modelAnswer: { answer: "I cool down by walking.", reason: "It helps my heart rate.", example: "I cool down for 5 minutes." }
-  },
-  {
-    id: 's22', category: 'Sports',
-    question: "When do you speed up in a race?",
-    targetVerb: { en: "speed up", ru: "ускоряться", uz: "tezlashmoq" },
-    modelAnswer: { answer: "I speed up at the end.", reason: "I want to win.", example: "I speed up when I see the finish line." }
-  },
-  {
-    id: 's23', category: 'Sports',
-    question: "When do you slow down?",
-    targetVerb: { en: "slow down", ru: "замедляться", uz: "sekinlashmoq" },
-    modelAnswer: { answer: "I slow down on corners.", reason: "It is safer.", example: "I slow down if I am tired." }
-  },
-  {
-    id: 's24', category: 'Sports',
-    question: "Do you carry on if it rains?",
-    targetVerb: { en: "carry on", ru: "продолжать", uz: "davom ettirmoq" },
-    modelAnswer: { answer: "I carry on playing.", reason: "Rain is fun.", example: "We carry on until the match ends." }
-  },
-
-  // --- SPORTS (New 10) ---
-  {
-    id: 's71', category: 'Sports',
-    question: "How do you burn off energy?",
-    targetVerb: { en: "burn off", ru: "сжигать (энергию)", uz: "sarflamoq" },
-    modelAnswer: { answer: "I burn off energy by swimming.", reason: "It is great cardio.", example: "I burn off calories fast in the pool." }
-  },
-  {
-    id: 's72', category: 'Sports',
-    question: "Do you try out for school teams?",
-    targetVerb: { en: "try out", ru: "пробоваться (в команду)", uz: "sinovdan o'tmoq" },
-    modelAnswer: { answer: "I try out for basketball.", reason: "I am tall.", example: "I try out every September." }
-  },
-  {
-    id: 's73', category: 'Sports',
-    question: "What time does the match kick off?",
-    targetVerb: { en: "kick off", ru: "начинаться (о матче)", uz: "o'yinni boshlamoq" },
-    modelAnswer: { answer: "It kicks off at 5 PM.", reason: "That is when the TV show starts.", example: "The final kicks off soon." }
-  },
-  {
-    id: 's74', category: 'Sports',
-    question: "Who do you cheer on?",
-    targetVerb: { en: "cheer on", ru: "поддерживать (болеть)", uz: "olqishlamoq" },
-    modelAnswer: { answer: "I cheer on Real Madrid.", reason: "They are the best team.", example: "I cheer on them loudly." }
-  },
-  {
-    id: 's75', category: 'Sports',
-    question: "Do you want to build up your muscles?",
-    targetVerb: { en: "build up", ru: "наращивать", uz: "kuchaytirmoq" },
-    modelAnswer: { answer: "I want to build up my arms.", reason: "I lift weights.", example: "Protein helps build up muscle." }
-  },
-  {
-    id: 's76', category: 'Sports',
-    question: "Do you stretch out after exercise?",
-    targetVerb: { en: "stretch out", ru: "потягиваться / растягиваться", uz: "kerishmoq" },
-    modelAnswer: { answer: "I stretch out my legs.", reason: "It stops the pain.", example: "I stretch out on the mat." }
-  },
-  {
-    id: 's77', category: 'Sports',
-    question: "Does running tire you out?",
-    targetVerb: { en: "tire out", ru: "изматывать", uz: "holdan toydirmoq" },
-    modelAnswer: { answer: "Yes, it tires me out quickly.", reason: "I am not fit.", example: "Sprinting tires me out the most." }
-  },
-  {
-    id: 's78', category: 'Sports',
-    question: "Can boxing knock you out?",
-    targetVerb: { en: "knock out", ru: "нокаутировать", uz: "nokaut qilmoq" },
-    modelAnswer: { answer: "A punch can knock you out.", reason: "It is a dangerous sport.", example: "Boxers try to knock out opponents." }
-  },
-  {
-    id: 's79', category: 'Sports',
-    question: "Can you keep up with the fastest runner?",
-    targetVerb: { en: "keep up", ru: "не отставать", uz: "yetib olmoq" },
-    modelAnswer: { answer: "I cannot keep up.", reason: "He is too fast.", example: "I try to keep up but I fail." }
-  },
-  {
-    id: 's80', category: 'Sports',
-    question: "Do you fall down often when skating?",
-    targetVerb: { en: "fall down", ru: "падать", uz: "yiqilmoq" },
-    modelAnswer: { answer: "I fall down a lot.", reason: "The ice is slippery.", example: "I fall down and laugh." }
-  },
-
-  // --- VIDEO GAMES (Original 8) ---
-  {
-    id: 's25', category: 'Video Games',
-    question: "What time do you log in to your game?",
-    targetVerb: { en: "log in", ru: "входить в систему", uz: "tizimga kirmoq" },
-    modelAnswer: { answer: "I log in after dinner.", reason: "That is my free time.", example: "I log in to Minecraft at 8 PM." }
-  },
-  {
-    id: 's26', category: 'Video Games',
-    question: "Do you turn on the sound when you play?",
-    targetVerb: { en: "turn on", ru: "включать", uz: "yoqmoq" },
-    modelAnswer: { answer: "I turn on the sound.", reason: "I need to hear enemies.", example: "I turn on my headset." }
-  },
-  {
-    id: 's27', category: 'Video Games',
-    question: "When do you turn off the console?",
-    targetVerb: { en: "turn off", ru: "выключать", uz: "o'chirmoq" },
-    modelAnswer: { answer: "I turn off it at 10 PM.", reason: "I need to sleep.", example: "My mom makes me turn it off." }
-  },
-  {
-    id: 's28', category: 'Video Games',
-    question: "How fast do you level up?",
-    targetVerb: { en: "level up", ru: "повышать уровень", uz: "darajani oshirmoq" },
-    modelAnswer: { answer: "I level up quickly.", reason: "I play every day.", example: "I level up twice a week." }
-  },
-  {
-    id: 's29', category: 'Video Games',
-    question: "Do you team up with friends?",
-    targetVerb: { en: "team up", ru: "объединяться в команду", uz: "jamoa tuzmoq" },
-    modelAnswer: { answer: "I team up with my classmates.", reason: "We work well together.", example: "We team up in Fortnite." }
-  },
-  {
-    id: 's30', category: 'Video Games',
-    question: "Do you look out for traps?",
-    targetVerb: { en: "look out", ru: "остерегаться", uz: "ehtiyot bo'lmoq" },
-    modelAnswer: { answer: "I look out for everything.", reason: "I don't want to die.", example: "I look out for snipers." }
-  },
-  {
-    id: 's31', category: 'Video Games',
-    question: "Do you give up if the level is hard?",
-    targetVerb: { en: "give up", ru: "сдаваться", uz: "tashlab qo'ymoq" },
-    modelAnswer: { answer: "I don't give up.", reason: "I like challenges.", example: "I try 10 times before I give up." }
-  },
-  {
-    id: 's32', category: 'Video Games',
-    question: "Do you sign up for new games?",
-    targetVerb: { en: "sign up", ru: "регистрироваться", uz: "ro'yxatdan o'tmoq" },
-    modelAnswer: { answer: "I sign up for betas.", reason: "I like new things.", example: "I sign up using my email." }
-  },
-
-  // --- VIDEO GAMES (New 10) ---
-  {
-    id: 's81', category: 'Video Games',
-    question: "When do you log out?",
-    targetVerb: { en: "log out", ru: "выходить из системы", uz: "chiqib ketmoq" },
-    modelAnswer: { answer: "I log out when I am tired.", reason: "My eyes hurt.", example: "I log out at 11 PM." }
-  },
-  {
-    id: 's82', category: 'Video Games',
-    question: "How do you sign in to your account?",
-    targetVerb: { en: "sign in", ru: "войти в систему", uz: "kirish" },
-    modelAnswer: { answer: "I sign in with a password.", reason: "It is secure.", example: "I sign in automatically." }
-  },
-  {
-    id: 's83', category: 'Video Games',
-    question: "Do you set up your own console?",
-    targetVerb: { en: "set up", ru: "устанавливать / настраивать", uz: "o'rnatmoq" },
-    modelAnswer: { answer: "I set up all the cables.", reason: "It is easy.", example: "I set up the TV and HDMI." }
-  },
-  {
-    id: 's84', category: 'Video Games',
-    question: "Do you plug in your controller?",
-    targetVerb: { en: "plug in", ru: "включать в розетку", uz: "tokka ulamoq" },
-    modelAnswer: { answer: "I plug in it to charge.", reason: "The battery is low.", example: "I plug in the USB cable." }
-  },
-  {
-    id: 's85', category: 'Video Games',
-    question: "Do you turn down the volume at night?",
-    targetVerb: { en: "turn down", ru: "убавить звук", uz: "ovozni pasaytirmoq" },
-    modelAnswer: { answer: "I turn down the music.", reason: "My parents are sleeping.", example: "I turn down the speakers." }
-  },
-  {
-    id: 's86', category: 'Video Games',
-    question: "Do you zoom in with the sniper?",
-    targetVerb: { en: "zoom in", ru: "приближать", uz: "yaqinlashtirmoq" },
-    modelAnswer: { answer: "I zoom in to see far away.", reason: "It helps me aim.", example: "I zoom in on the enemy base." }
-  },
-  {
-    id: 's87', category: 'Video Games',
-    question: "Do you shoot down planes in the game?",
-    targetVerb: { en: "shoot down", ru: "сбивать", uz: "otib tashlamoq" },
-    modelAnswer: { answer: "I shoot down enemy jets.", reason: "They attack me.", example: "I shoot down helicopters too." }
-  },
-  {
-    id: 's88', category: 'Video Games',
-    question: "Do cars blow up in this game?",
-    targetVerb: { en: "blow up", ru: "взрываться", uz: "portlamoq" },
-    modelAnswer: { answer: "Everything blows up.", reason: "It is an action game.", example: "Tanks blow up when I hit them." }
-  },
-  {
-    id: 's89', category: 'Video Games',
-    question: "Do you run away from bosses?",
-    targetVerb: { en: "run away", ru: "убегать", uz: "qochmoq" },
-    modelAnswer: { answer: "I run away to heal.", reason: "The boss is strong.", example: "I run away and hide." }
-  },
-  {
-    id: 's90', category: 'Video Games',
-    question: "Do you fight back when attacked?",
-    targetVerb: { en: "fight back", ru: "давать сдачи", uz: "qarshi kurashmoq" },
-    modelAnswer: { answer: "I always fight back.", reason: "I want to win.", example: "I fight back with my sword." }
-  },
-
-  // --- READING (Original 8) ---
-  {
-    id: 's33', category: 'Reading',
-    question: "When do you pick up a book?",
-    targetVerb: { en: "pick up", ru: "брать в руки", uz: "qo'lga olmoq" },
-    modelAnswer: { answer: "I pick up a book on Sundays.", reason: "It is quiet then.", example: "I pick up mystery novels." }
-  },
-  {
-    id: 's34', category: 'Reading',
-    question: "Do you look up words you don't know?",
-    targetVerb: { en: "look up", ru: "искать (в словаре)", uz: "lug'atdan qaramoq" },
-    modelAnswer: { answer: "I look up new words.", reason: "I want to learn English.", example: "I look up words on Google." }
-  },
-  {
-    id: 's35', category: 'Reading',
-    question: "Do you read out loud?",
-    targetVerb: { en: "read out", ru: "читать вслух", uz: "ovoz chiqarib o'qimoq" },
-    modelAnswer: { answer: "I read out loud sometimes.", reason: "It helps my pronunciation.", example: "I read out dialogues." }
-  },
-  {
-    id: 's36', category: 'Reading',
-    question: "Do you write down interesting phrases?",
-    targetVerb: { en: "write down", ru: "записывать", uz: "yozib olmoq" },
-    modelAnswer: { answer: "I write down cool quotes.", reason: "I use them later.", example: "I write down phrases in my notebook." }
-  },
-  {
-    id: 's37', category: 'Reading',
-    question: "When do you put down your book?",
-    targetVerb: { en: "put down", ru: "откладывать", uz: "olib qo'ymoq" },
-    modelAnswer: { answer: "I put down my book when I am tired.", reason: "My eyes hurt.", example: "I put down the book at midnight." }
-  },
-  {
-    id: 's38', category: 'Reading',
-    question: "Do you flick through a book before buying it?",
-    targetVerb: { en: "flick through", ru: "пролистывать", uz: "varaqab chiqmoq" },
-    modelAnswer: { answer: "I flick through the pages.", reason: "I check the pictures.", example: "I flick through magazines too." }
-  },
-  {
-    id: 's39', category: 'Reading',
-    question: "Do you turn over the page quickly?",
-    targetVerb: { en: "turn over", ru: "переворачивать", uz: "o'girmoq" },
-    modelAnswer: { answer: "I turn over pages fast.", reason: "I read very quickly.", example: "I turn over the page to see what happens." }
-  },
-  {
-    id: 's40', category: 'Reading',
-    question: "Do you go over what you read?",
-    targetVerb: { en: "go over", ru: "повторять / пересматривать", uz: "qayta ko'rib chiqmoq" },
-    modelAnswer: { answer: "I go over the main ideas.", reason: "It helps me remember.", example: "I go over the chapter summary." }
-  },
-
-  // --- READING (New 10) ---
-  {
-    id: 's91', category: 'Reading',
-    question: "Do you read through the whole chapter?",
-    targetVerb: { en: "read through", ru: "прочитать от начала до конца", uz: "to'liq o'qib chiqmoq" },
-    modelAnswer: { answer: "I read through it all.", reason: "I don't want to miss details.", example: "I read through the instructions." }
-  },
-  {
-    id: 's92', category: 'Reading',
-    question: "Do you thumb through magazines?",
-    targetVerb: { en: "thumb through", ru: "бегло просматривать", uz: "ko'z yugurtirib chiqmoq" },
-    modelAnswer: { answer: "I thumb through them at the clinic.", reason: "I am waiting for the doctor.", example: "I thumb through sports magazines." }
-  },
-  {
-    id: 's93', category: 'Reading',
-    question: "What do you look at on the cover?",
-    targetVerb: { en: "look at", ru: "смотреть на", uz: "qaramoq" },
-    modelAnswer: { answer: "I look at the title.", reason: "It tells me the topic.", example: "I look at the author's name too." }
-  },
-  {
-    id: 's94', category: 'Reading',
-    question: "Do you turn back to the first page?",
-    targetVerb: { en: "turn back", ru: "возвращаться (к странице)", uz: "orqaga qaytmoq" },
-    modelAnswer: { answer: "I turn back to check names.", reason: "I forget character names.", example: "I turn back to chapter one." }
-  },
-  {
-    id: 's95', category: 'Reading',
-    question: "Do you fill in the answers in your book?",
-    targetVerb: { en: "fill in", ru: "заполнять", uz: "to'ldirmoq" },
-    modelAnswer: { answer: "I fill in the blanks.", reason: "It is a workbook.", example: "I fill in the form with a pen." }
-  },
-  {
-    id: 's96', category: 'Reading',
-    question: "Do you rub out your mistakes?",
-    targetVerb: { en: "rub out", ru: "стирать ластиком", uz: "o'chirg'ichda o'chirmoq" },
-    modelAnswer: { answer: "I rub out pencil marks.", reason: "I want it to look clean.", example: "I rub out the wrong answer." }
-  },
-  {
-    id: 's97', category: 'Reading',
-    question: "Do you cross out wrong words?",
-    targetVerb: { en: "cross out", ru: "зачеркивать", uz: "ustidan chizmoq" },
-    modelAnswer: { answer: "I cross out bad ideas.", reason: "I write a better one.", example: "I cross out the sentence." }
-  },
-  {
-    id: 's98', category: 'Reading',
-    question: "Do you cut out pictures from papers?",
-    targetVerb: { en: "cut out", ru: "вырезать", uz: "qirqib olmoq" },
-    modelAnswer: { answer: "I cut out photos for my project.", reason: "I need images.", example: "I cut out a picture of a cat." }
-  },
-  {
-    id: 's99', category: 'Reading',
-    question: "How many books do you check out?",
-    targetVerb: { en: "check out", ru: "брать (книгу в библиотеке)", uz: "rasmiylashtirib olmoq" },
-    modelAnswer: { answer: "I check out two books.", reason: "That is the limit.", example: "I check out a history book." }
-  },
-  {
-    id: 's100', category: 'Reading',
-    question: "When do you bring back the books?",
-    targetVerb: { en: "bring back", ru: "возвращать", uz: "qaytarib bermoq" },
-    modelAnswer: { answer: "I bring back them in two weeks.", reason: "The library fines are expensive.", example: "I bring back them on Monday." }
-  },
-
-  // --- FUN (Original 10) ---
-  {
-    id: 's41', category: 'Fun',
-    question: "What do you look forward to?",
-    targetVerb: { en: "look forward to", ru: "ждать с нетерпением", uz: "intizorlik bilan kutmoq" },
-    modelAnswer: { answer: "I look forward to the weekend.", reason: "I can relax.", example: "I look forward to summer break." }
-  },
-  {
-    id: 's42', category: 'Fun',
-    question: "Who do you get along with?",
-    targetVerb: { en: "get along with", ru: "ладить с", uz: "chiqishmoq" },
-    modelAnswer: { answer: "I get along with everyone.", reason: "I am friendly.", example: "I get along with my sister well." }
-  },
-  {
-    id: 's43', category: 'Fun',
-    question: "What do you do when you run out of money?",
-    targetVerb: { en: "run out of", ru: "заканчиваться (о деньгах)", uz: "tugab qolmoq" },
-    modelAnswer: { answer: "I ask my dad when I run out of money.", reason: "I don't have a job.", example: "I run out of cash often." }
-  },
-  {
-    id: 's44', category: 'Fun',
-    question: "Do you show off your skills?",
-    targetVerb: { en: "show off", ru: "хвастаться", uz: "maqtamoq / ko'z-ko'z qilmoq" },
-    modelAnswer: { answer: "I show off my dancing.", reason: "I am a good dancer.", example: "I show off at parties." }
-  },
-  {
-    id: 's45', category: 'Fun',
-    question: "What places do you check out?",
-    targetVerb: { en: "check out", ru: "заценить / проверить", uz: "tekshirib ko'rmoq" },
-    modelAnswer: { answer: "I check out new cafes.", reason: "I love food.", example: "I check out places in the mall." }
-  },
-  {
-    id: 's46', category: 'Fun',
-    question: "How do you cheer up your friends?",
-    targetVerb: { en: "cheer up", ru: "подбадривать", uz: "ko'nglini ko'tarmoq" },
-    modelAnswer: { answer: "I cheer up them with jokes.", reason: "Laughter is good.", example: "I buy them chocolate to cheer them up." }
-  },
-  {
-    id: 's47', category: 'Fun',
-    question: "Do you want to grow up fast?",
-    targetVerb: { en: "grow up", ru: "взрослеть", uz: "ulg'aymoq" },
-    modelAnswer: { answer: "I don't want to grow up.", reason: "Adult life is hard.", example: "I want to stay young." }
-  },
-  {
-    id: 's48', category: 'Fun',
-    question: "When do you calm down?",
-    targetVerb: { en: "calm down", ru: "успокаиваться", uz: "tinchlanmoq" },
-    modelAnswer: { answer: "I calm down when I listen to music.", reason: "It stops my stress.", example: "I calm down after a test." }
-  },
-  {
-    id: 's49', category: 'Fun',
-    question: "Do you take up new hobbies?",
-    targetVerb: { en: "take up", ru: "браться за (хобби)", uz: "boshlamoq (mashg'ulot)" },
-    modelAnswer: { answer: "I take up sports.", reason: "I like being active.", example: "I take up tennis in summer." }
-  },
-  {
-    id: 's50', category: 'Fun',
-    question: "Do you turn up late to parties?",
-    targetVerb: { en: "turn up", ru: "появляться / приходить", uz: "yetib kelmoq" },
-    modelAnswer: { answer: "I never turn up late.", reason: "I am punctual.", example: "I turn up 5 minutes early." }
-  },
-
-  // --- FUN (New 10) ---
-  {
-    id: 's101', category: 'Fun',
-    question: "Do you look back at old photos?",
-    targetVerb: { en: "look back", ru: "вспоминать прошлое", uz: "o'tmishni eslamoq" },
-    modelAnswer: { answer: "I look back at baby photos.", reason: "They are funny.", example: "I look back and smile." }
-  },
-  {
-    id: 's102', category: 'Fun',
-    question: "What makes you crack up?",
-    targetVerb: { en: "crack up", ru: "хохотать", uz: "qotib kulmoq" },
-    modelAnswer: { answer: "Comedy movies make me crack up.", reason: "I love jokes.", example: "My friend makes me crack up." }
-  },
-  {
-    id: 's103', category: 'Fun',
-    question: "Do you burst out laughing often?",
-    targetVerb: { en: "burst out", ru: "разразиться (смехом)", uz: "yorilib ketmoq (kulgi)" },
-    modelAnswer: { answer: "I burst out laughing in class.", reason: "It was a mistake.", example: "I burst out crying sometimes too." }
-  },
-  {
-    id: 's104', category: 'Fun',
-    question: "Do you run into friends at the mall?",
-    targetVerb: { en: "run into", ru: "случайно встретить", uz: "duch kelmoq" },
-    modelAnswer: { answer: "I run into people often.", reason: "My town is small.", example: "I run into my teacher at the shop." }
-  },
-  {
-    id: 's105', category: 'Fun',
-    question: "Do you show up early for movies?",
-    targetVerb: { en: "show up", ru: "появляться", uz: "paydo bo'lmoq" },
-    modelAnswer: { answer: "I show up 20 minutes early.", reason: "I want popcorn.", example: "I show up before the trailers." }
-  },
-  {
-    id: 's106', category: 'Fun',
-    question: "Do you take part in school plays?",
-    targetVerb: { en: "take part in", ru: "участвовать", uz: "ishtirok etmoq" },
-    modelAnswer: { answer: "I take part in the drama club.", reason: "I like acting.", example: "I take part in the spring show." }
-  },
-  {
-    id: 's107', category: 'Fun',
-    question: "Do you go along with your friends' plans?",
-    targetVerb: { en: "go along with", ru: "соглашаться", uz: "fikriga qo'shilmoq" },
-    modelAnswer: { answer: "I go along with them.", reason: "I am easygoing.", example: "I go along with whatever they want." }
-  },
-  {
-    id: 's108', category: 'Fun',
-    question: "Can you hold on for a minute?",
-    targetVerb: { en: "hold on", ru: "подождать", uz: "kutib turmoq" },
-    modelAnswer: { answer: "I can hold on.", reason: "I am patient.", example: "Hold on, I am coming." }
-  },
-  {
-    id: 's109', category: 'Fun',
-    question: "Do you watch out for cars?",
-    targetVerb: { en: "watch out", ru: "быть осторожным", uz: "ehtiyot bo'lmoq" },
-    modelAnswer: { answer: "I watch out when crossing.", reason: "Safety is key.", example: "Watch out! A bike is coming." }
-  },
-  {
-    id: 's110', category: 'Fun',
-    question: "Do you mix up twins?",
-    targetVerb: { en: "mix up", ru: "перепутать", uz: "adashtirib yubormoq" },
-    modelAnswer: { answer: "I mix up them always.", reason: "They look the same.", example: "I mix up their names." }
+    id: 's1',
+    category: 'Daily Routine',
+    question: 'What time do you usually wake up?',
+    targetVerb: { en: 'wake up', ru: 'просыпаться', uz: "uyg'onmoq" },
+    modelAnswer: {
+      answer: 'I usually wake up at 7:00 AM.',
+      reason: 'I need to get ready for school.',
+      example: 'For example, yesterday I woke up at 7:00 and had breakfast.'
+    }
+  },
+  {
+    id: 's2',
+    category: 'Free Time',
+    question: 'Do you hang out with friends often?',
+    targetVerb: { en: 'hang out', ru: 'тусоваться/проводить время', uz: "vaqt o'tkazmoq" },
+    modelAnswer: {
+      answer: 'Yes, I hang out with my friends every weekend.',
+      reason: 'We like to play video games together.',
+      example: 'Last Saturday, we hung out at the park.'
+    }
+  },
+  {
+    id: 's3',
+    category: 'Sports',
+    question: 'Do you work out at the gym?',
+    targetVerb: { en: 'work out', ru: 'тренироваться', uz: "shug'ullanmoq" },
+    modelAnswer: {
+      answer: 'I work out three times a week.',
+      reason: 'It helps me stay healthy.',
+      example: 'I usually work out on Mondays, Wednesdays, and Fridays.'
+    }
+  },
+  {
+    id: 's4',
+    category: 'Video Games',
+    question: 'When do you log in to play games?',
+    targetVerb: { en: 'log in', ru: 'входить в систему', uz: "tizimga kirmoq" },
+    modelAnswer: {
+      answer: 'I log in after I finish my homework.',
+      reason: 'I enjoy playing online with friends.',
+      example: 'I usually log in around 8 PM.'
+    }
+  },
+  {
+    id: 's5',
+    category: 'Reading',
+    question: 'Do you look up words you don\'t know?',
+    targetVerb: { en: 'look up', ru: 'искать (в словаре)', uz: "qidirmoq (lug'atdan)" },
+    modelAnswer: {
+      answer: 'Yes, I look up new words in the dictionary.',
+      reason: 'It helps me improve my vocabulary.',
+      example: 'I looked up "phrasal verb" yesterday.'
+    }
+  },
+  {
+    id: 's6',
+    category: 'Fun',
+    question: 'Do you dress up for parties?',
+    targetVerb: { en: 'dress up', ru: 'наряжаться', uz: "yasanmoq" },
+    modelAnswer: {
+      answer: 'I dress up for special occasions.',
+      reason: 'It is fun to wear nice clothes.',
+      example: 'I dressed up as a superhero for Halloween.'
+    }
   }
+];
+
+export const CAMPAIGN_LEVELS: CampaignLevel[] = [
+  { id: 1, title: 'The Awakening', questions: KAHOOT_QUESTIONS.slice(0, 5) },
+  { id: 2, title: 'Daily Grind', questions: KAHOOT_QUESTIONS.slice(5, 10) },
+  { id: 3, title: 'Travel Troubles', questions: KAHOOT_QUESTIONS.slice(10, 15) },
+  { id: 4, title: 'Social Life', questions: KAHOOT_QUESTIONS.slice(15, 20) },
+  { id: 5, title: 'Emergency!', questions: KAHOOT_QUESTIONS.slice(20, 25) },
+  { id: 6, title: 'The Boss Run', questions: KAHOOT_QUESTIONS.slice(25, 35) },
 ];
